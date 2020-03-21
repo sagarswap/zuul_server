@@ -32,30 +32,14 @@ pipeline {
                 '''
         }
     }
-  stage('Docker Image Build') {
-      steps{
-         sh "docker build -t zuul_server:latest ."
+  stage('Docker Image Build Push') {
+        steps{
+           sh '''docker build -t 10.0.1.11:5000/zuul_server:latest .
+                 docker push 10.0.1.11:5000/zuul_server
+                 docker rmi 10.0.1.11:5000/zuul_server
+              '''
+        }
       }
-    }
-    stage('Docker save'){
-        steps{
-            sh "docker save zuul_server:latest>zuul_server.tar"
-        }
-    }
- 
-    stage('Upload to S3'){
-        steps{
-            withAWS(region:'us-east-1',credentials:'aws-cred')
-            {
-                s3Upload(bucket:'bucketforsprint',file:'zuul_server.tar',workingDir:'./');
-            }
-        }
-    }
-    stage('Tar remove'){
-        steps{
-            sh "rm zuul_server.tar"
-        }
-    }
   }
  
 }
