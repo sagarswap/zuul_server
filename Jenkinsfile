@@ -26,18 +26,27 @@ pipeline {
     }
     stage('Maven Build'){
         steps{
-                sh label:'Maven Build of war file', script:'''
+                sh label:'Maven Build of jar file', script:'''
                     mvn clean install -DskipTests=false
                     mvn package
                 '''
         }
     }
-  stage('Docker Image Build Push') {
+    stage('Docker Image Build Push') {
         steps{
-           sh '''docker build -t 10.0.1.11:5000/zuul_server:latest .
-                 docker push 10.0.1.11:5000/zuul_server
-                 docker rmi 10.0.1.11:5000/zuul_server
-              '''
+           sh "docker build -t 10.0.1.11:5000/zuul_server:latest ."
+        }
+      }
+
+    stage('Docker Image Push') {
+        steps{
+           sh "docker push 10.0.1.11:5000/zuul_server"
+        }
+      }
+    
+    stage('Docker Image Remove) {
+        steps{
+           sh "docker rmi 10.0.1.11:5000/zuul_server"
         }
       }
   }
